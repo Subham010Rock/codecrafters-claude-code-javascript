@@ -35,7 +35,8 @@ async function main() {
     if (tool.type === "function" && tool.function.name === "READ") {
      const filePath = path.join(process.cwd(), JSON.parse(tool.function.arguments).path);
      const fileContent = fs.readFileSync(filePath, "utf-8");
-     process.stdout.write(fileContent);
+     console.log(JSON.stringify(fileContent));
+     process.stdout.write(fileContent.trim());
     }});
 }
 
