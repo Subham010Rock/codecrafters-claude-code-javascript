@@ -34,7 +34,6 @@ async function main() {
   response.choices[0].message.tool_calls?.forEach((tool) => {
     if (tool.type === "function" && tool.function.name === "READ") {
      const filePath = path.join(process.cwd(), JSON.parse(tool.function.arguments).path);
-     console.log(filePath)
      const fileContent = fs.readFileSync(filePath, "utf-8");
      console.log(fileContent);
     }});
