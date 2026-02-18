@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-
+import fs from "fs";
 async function main() {
   const [, , flag, prompt] = process.argv;
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -37,7 +37,7 @@ async function main() {
   response.choices[0].message.tool_calls?.forEach((tool) => {
     if (tool.type === "function" && tool.function.name === "READ") {
      const filePath = JSON.parse(tool.function.arguments).filePath;
-     const fileContent = FileSystem.readFileSync(filePath, "utf-8");
+     const fileContent = fs.readFileSync(filePath, "utf-8");
      console.log(fileContent);
     }});
 }
