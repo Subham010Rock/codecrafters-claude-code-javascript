@@ -28,15 +28,16 @@ async function main() {
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   console.error("Logs from your program will appear here!");
 
-  // TODO: Uncomment the lines below to pass the first stage
-  // console.log(response.choices[0].message.content);
-
   response.choices[0].message.tool_calls?.forEach((tool) => {
     if (tool.type === "function" && tool.function.name === "READ") {
      const filePath = path.join(process.cwd(), JSON.parse(tool.function.arguments).path);
      const fileContent = fs.readFileSync(filePath, "utf-8");
      process.stdout.write(fileContent.trim());
     }});
+    
+  // TODO: Uncomment the lines below to pass the first stage
+  console.log(response.choices[0].message.content);
+
 }
 
 main();
