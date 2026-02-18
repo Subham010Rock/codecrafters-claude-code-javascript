@@ -33,6 +33,13 @@ async function main() {
 
   // TODO: Uncomment the lines below to pass the first stage
   console.log(response.choices[0].message.content);
+
+  response.choices[0].message.tool_calls?.forEach((tool) => {
+    if (tool.type === "function" && tool.function.name === "READ") {
+     const filePath = JSON.parse(tool.function.arguments).filePath;
+     const fileContent = FileSystem.readFileSync(filePath, "utf-8");
+     console.log(fileContent);
+    }});
 }
 
 main();
