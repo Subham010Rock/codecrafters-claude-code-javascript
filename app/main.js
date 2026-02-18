@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import fs from "fs";
+import path from "path";
 async function main() {
   const [, , flag, prompt] = process.argv;
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -24,10 +25,6 @@ async function main() {
     tools: [{type: "function", function: {name: "READ", description: "Read and return the contents of a file.", parameters: {type: "object", properties: {path: {type: "string", description: "The path to the file to read."}}, required: ["path"]}}}],
   });
 
-  if (!response.choices || response.choices.length === 0) {
-    throw new Error("no choices in response");
-  }
-
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   console.error("Logs from your program will appear here!");
 
@@ -36,7 +33,8 @@ async function main() {
 
   response.choices[0].message.tool_calls?.forEach((tool) => {
     if (tool.type === "function" && tool.function.name === "READ") {
-     const filePath = JSON.parse(tool.function.arguments).filePath;
+     const filePath = path.join(process.cwd(), JSON.parse(tool.function.arguments).filePath);
+     console.log(filePath)
      const fileContent = fs.readFileSync(filePath, "utf-8");
      console.log(fileContent);
     }});
