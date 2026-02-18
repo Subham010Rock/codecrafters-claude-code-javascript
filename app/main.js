@@ -6,6 +6,7 @@ async function main() {
   const apiKey = process.env.OPENROUTER_API_KEY;
   const baseURL =
     process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
+  console.log(apiKey, baseURL, flag, prompt);
 
   if (!apiKey) {
     throw new Error("OPENROUTER_API_KEY is not set");
@@ -34,7 +35,7 @@ async function main() {
      const fileContent = fs.readFileSync(filePath, "utf-8");
      process.stdout.write(fileContent.trim());
     }});
-    
+
   // TODO: Uncomment the lines below to pass the first stage
   console.log(response.choices[0].message.content);
 
