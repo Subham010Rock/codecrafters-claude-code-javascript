@@ -24,7 +24,7 @@ async function main() {
     messages,
     tools: [{type: "function", function: {name: "READ", description: "Read and return the contents of a file.", parameters: {type: "object", properties: {path: {type: "string", description: "The path to the file to read."}}, required: ["path"]}}}],
   });
-
+  
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   console.error("Logs from your program will appear here!");
 
@@ -35,7 +35,7 @@ async function main() {
      const filePath = path.join(process.cwd(), JSON.parse(tool.function.arguments).path);
      const fileContent = fs.readFileSync(filePath, "utf-8");
      messages.push(
-      {role: "tool", name: "READ", content: fileContent}
+      {role: "tool", toolCallId:tool.id,name: tool.function.name, content: fileContent}
      )
     }
   });
