@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
+import {Read,Write,toolSchema} from "./tools.js";
 async function main() {
   const [, , flag, prompt] = process.argv;
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -22,7 +23,7 @@ async function main() {
   let  response = await client.chat.completions.create({
     model: "anthropic/claude-haiku-4.5",
     messages,
-    tools: [{type: "function", function: {name: "READ", description: "Read and return the contents of a file.", parameters: {type: "object", properties: {path: {type: "string", description: "The path to the file to read."}}, required: ["path"]}}}],
+    tools: [toolSchema.get('Read'),toolSchema.get('Write')],
   });
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   console.error("Logs from your program will appear here!");
@@ -30,18 +31,29 @@ async function main() {
   while (response.choices[0].message.tool_calls && response.choices[0].message.tool_calls.length > 0) {
     messages.push(response.choices[0].message);
   response.choices[0].message.tool_calls?.forEach((tool) => {
-    if (tool.type === "function" && tool.function.name === "READ") {
-     const filePath = path.join(process.cwd(), JSON.parse(tool.function.arguments).path);
-     const fileContent = fs.readFileSync(filePath, "utf-8");
+    if (tool.type === "function" && tool.function.name === "Read") {
+      const path = JSON.parse(tool.function.arguments).path;
+      const content = Read(path);
      messages.push(
-      {role: "tool", tool_call_id:tool.id,name: tool.function.name, content: fileContent}
+      {role: "tool", tool_call_id:tool.id,name: tool.function.name, content}
      )
+    }else if(tool.type === "function" && tool.function.name === "Write"){
+      const toolParams = JSON.parse(tool.function.arguments);
+      const path = toolParams.file_path;
+      const content = toolParams.content;
+      const result = Write(path,content);
+      messages.push({
+        role:'tool',
+        name:tool.function.name,
+        tool_call_id:tool.id,
+        content:result
+      })
     }
   });
      response = await client.chat.completions.create({
     model: "anthropic/claude-haiku-4.5",
     messages,
-    tools: [{type: "function", function: {name: "READ", description: "Read and return the contents of a file.", parameters: {type: "object", properties: {path: {type: "string", description: "The path to the file to read."}}, required: ["path"]}}}],
+    tools: [toolSchema.get('Read'),toolSchema.get('Write')],
   })
 }
 
