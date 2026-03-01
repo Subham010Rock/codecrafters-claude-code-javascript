@@ -24,7 +24,6 @@ async function main() {
     messages,
     tools: [{type: "function", function: {name: "READ", description: "Read and return the contents of a file.", parameters: {type: "object", properties: {path: {type: "string", description: "The path to the file to read."}}, required: ["path"]}}}],
   });
-  console.log(response.choices[0].message);
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   console.error("Logs from your program will appear here!");
 
