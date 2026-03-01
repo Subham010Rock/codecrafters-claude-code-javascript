@@ -40,7 +40,8 @@ async function main() {
   });
      response = await client.chat.completions.create({
     model: "anthropic/claude-haiku-4.5",
-    messages
+    messages,
+    tools: [{type: "function", function: {name: "READ", description: "Read and return the contents of a file.", parameters: {type: "object", properties: {path: {type: "string", description: "The path to the file to read."}}, required: ["path"]}}}],
   })
 }
 
