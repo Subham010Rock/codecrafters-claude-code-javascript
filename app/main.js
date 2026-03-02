@@ -67,7 +67,7 @@ async function main() {
      response = await client.chat.completions.create({
     model: "anthropic/claude-haiku-4.5",
     messages,
-    tools: [toolSchema.get('Read'),toolSchema.get('Write')],
+    tools: [toolSchema.get('Read'),toolSchema.get('Write'),toolSchema.get('Bash')],
   })
 }
 
