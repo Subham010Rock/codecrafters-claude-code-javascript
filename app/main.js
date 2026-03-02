@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import {Read,Write,toolSchema,Bash} from "./tools.js";
 async function main() {
   const [, , flag, prompt] = process.argv;
+  console.log(prompt);
   const apiKey = process.env.OPENROUTER_API_KEY;
   const baseURL =
     process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1";
