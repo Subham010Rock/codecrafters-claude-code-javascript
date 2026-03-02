@@ -1,7 +1,5 @@
 import OpenAI from "openai";
-import fs from "fs";
-import path from "path";
-import {Read,Write,toolSchema} from "./tools.js";
+import {Read,Write,toolSchema,Bash} from "./tools.js";
 async function main() {
   const [, , flag, prompt] = process.argv;
   const apiKey = process.env.OPENROUTER_API_KEY;
