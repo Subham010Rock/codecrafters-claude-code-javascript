@@ -18,10 +18,11 @@ async function main() {
   });
 
   const messages =  [{ role: "user", content: prompt }]
+  const tools = [toolSchema.get('Read'),toolSchema.get('Write'),toolSchema.get('Bash')];
   let  response = await client.chat.completions.create({
     model: "anthropic/claude-haiku-4.5",
     messages,
-    tools: [toolSchema.get('Read'),toolSchema.get('Write'),toolSchema.get('Bash')],
+    tools,
   });
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   console.error("Logs from your program will appear here!");
@@ -55,10 +56,11 @@ async function main() {
         tool_call_id:tool.id,
       }
       try{
-        const result = await Bash(command);
+        const result = execSync(command,{encoding:'utf-8',stdio:'pipe'});
         messages.push({...message,content:result});
       }catch(error){
-        messages.push({...message,content:error});
+        const stderr = error.stderr?.toString() || error.message;
+        messages.push({...message,content:stderr});
       }
     }
   });
