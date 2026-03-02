@@ -1,5 +1,7 @@
 import fs  from 'fs';
 import path from 'path';
+import { exec } from 'child_process';
+import { stderr, stdout } from 'process';
 
 function getFilePathByName(parentPath,filePath){
     let currDir = path.resolve(parentPath);
@@ -25,6 +27,30 @@ export function Write(filePath,content){
     const file_path = path.join(directory_path,path.basename(filePath));
     fs.writeFileSync(file_path,content,{flag:'w'});
     return "created the file";
+}
+
+export function Bash(command){
+    // command = getCommandWithAbsolutePath(command);
+    return new Promise((resolve,reject)=>{
+        exec(command, (error,stdout,stderr)=>{
+        if(error){
+            reject(error);
+        }
+        if(stderr){
+            resolve(stderr)
+        }
+        resolve(stdout);
+    });
+    })
+}
+
+function getCommandWithAbsolutePath(commandString){
+    const commandArray = commandString.split(" ");
+    const fileName = commandArray[commandArray.length-1];
+    const filePath = getFilePathByName("",fileName);
+    commandArray[commandArray.length-1]=filePath;
+    return commandArray.join(" ");
+
 }
 
 export const toolSchema = new Map();
@@ -65,6 +91,24 @@ toolSchema.set('Read',{
                 }
             }, 
             required: ["path"]
+        }
+    }
+})
+
+toolSchema.set('Bash',{
+    type:"function",
+    function:{
+        name:'Bash',
+        description:"Execute a shell command",
+        parameters:{
+            type:"object",
+            required:["command"],
+            properties:{
+                command:{
+                    type:"string",
+                    description:"command to execute"
+                }
+            }
         }
     }
 })

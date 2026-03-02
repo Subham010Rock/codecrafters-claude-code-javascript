@@ -23,14 +23,14 @@ async function main() {
   let  response = await client.chat.completions.create({
     model: "anthropic/claude-haiku-4.5",
     messages,
-    tools: [toolSchema.get('Read'),toolSchema.get('Write')],
+    tools: [toolSchema.get('Read'),toolSchema.get('Write'),toolSchema.get('Bash')],
   });
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   console.error("Logs from your program will appear here!");
 
   while (response.choices[0].message.tool_calls && response.choices[0].message.tool_calls.length > 0) {
     messages.push(response.choices[0].message);
-  response.choices[0].message.tool_calls?.forEach((tool) => {
+  response.choices[0].message.tool_calls?.forEach(async (tool) => {
     if (tool.type === "function" && tool.function.name === "Read") {
       const path = JSON.parse(tool.function.arguments).path;
       const content = Read(path);
@@ -48,6 +48,20 @@ async function main() {
         tool_call_id:tool.id,
         content:result
       })
+    }
+    else if(tool.type === "function" && tool.function.name === "Bash"){
+      const command = JSON.parse(tool.function.arguments).command;
+      const message = {
+        role:'tool',
+        name:tool.function.name,
+        tool_call_id:tool.id,
+      }
+      try{
+        const result = await Bash(command);
+        messages.push({...message,content:result});
+      }catch(error){
+        messages.push({...message,content:error});
+      }
     }
   });
      response = await client.chat.completions.create({
